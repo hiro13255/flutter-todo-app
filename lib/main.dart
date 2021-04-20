@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+class Todo {
+  String title;
+  String discription;
+
+  Todo(this.title, this.discription);
+}
+
 void main() {
   // 最初に表示するWidget
   runApp(MyTodoApp());
@@ -33,6 +40,7 @@ class TodoListPage extends StatefulWidget {
 class _TodoListPageState extends State<TodoListPage> {
   // Todoリストのデータ
   List<String> todoList = [];
+  List<Todo> detailTodo = [];
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +51,15 @@ class _TodoListPageState extends State<TodoListPage> {
       ),
       // データを元にListViewを作成
       body: ListView.builder(
-        itemCount: todoList.length,
+        itemCount: detailTodo.length,
         itemBuilder: (context, index) {
           return Card(
             child: ListTile(
-              title: Text(todoList[index]),
+              title: Text(detailTodo[index].title),
+              subtitle: Text(
+                  detailTodo[index].discription,
+                  maxLines: 3 // 表示行数指定
+              ),
             ),
           );
         },
@@ -66,7 +78,7 @@ class _TodoListPageState extends State<TodoListPage> {
             // キャンセルした場合は newListText が null となるので注意
             setState(() {
               // リスト追加
-              todoList.add(newListText);
+              detailTodo.add(newListText);
             });
           }
         },
@@ -83,7 +95,7 @@ class TodoAddPage extends StatefulWidget {
 
 class _TodoAddPageState extends State<TodoAddPage> {
   // 入力されたテキストをデータとして持つ
-  String _text = '';
+  Todo _todo = new Todo("", "");
 
   // データを元に表示するWidget
   @override
@@ -108,7 +120,22 @@ class _TodoAddPageState extends State<TodoAddPage> {
                 // データが変更したことを知らせる（画面を更新する）
                 setState(() {
                   // データを変更
-                  _text = value;
+                  _todo.title = value;
+                });
+              },
+            ),
+            const SizedBox(height: 30),
+            Text('下記に詳しい内容を記入'),
+            const SizedBox(height: 20),
+            TextField(
+              maxLines: null,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'タスクの詳細を入力してください',
+              ),
+              onChanged: (String value) {
+                setState(() {
+                  _todo.discription = value;
                 });
               },
             ),
@@ -121,7 +148,7 @@ class _TodoAddPageState extends State<TodoAddPage> {
                 onPressed: () {
                   // "pop"で前の画面に戻る
                   // "pop"の引数から前の画面にデータを渡す
-                  Navigator.of(context).pop(_text);
+                  Navigator.of(context).pop(_todo);
                 },
                 child: Text('リスト追加', style: TextStyle(color: Colors.white)),
               ),
